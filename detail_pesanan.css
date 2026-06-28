@@ -1,44 +1,58 @@
-/* Reset Dasar */
+/* ==========================================================================
+   DETAIL PESANAN - RESPONSIVE & MATCHED THEME
+   ========================================================================== */
+
+/* Reset & Base Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-    background-color: #f9f9f9;
-    padding: 20px;
+    /* Mengikuti gradient landing_page.css */
+    background: linear-gradient(135deg, #e96711 0%, #8b5a2b 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
 
 .app-container {
     width: 100%;
     max-width: 400px;
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    background: rgba(255, 255, 255, 0.95); /* Sedikit transparan agar terlihat premium */
+    padding: 25px;
+    border-radius: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 /* Detail Produk */
 #nama-produk {
     font-size: 24px;
+    font-weight: 800;
     margin-bottom: 15px;
-    color: #333;
+    color: #1a0f08;
+    line-height: 1.2;
 }
 
 #img-produk {
-    border-radius: 15px;
+    width: 100%;
+    height: 220px;
     object-fit: cover;
-    margin-bottom: 15px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    display: block;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
 #harga-produk {
     font-size: 20px;
-    font-weight: bold;
-    color: #e67e22;
+    font-weight: 800;
+    color: #d35400; /* Warna senada dengan gradient */
     margin-bottom: 20px;
 }
 
@@ -46,49 +60,71 @@ body {
 .qty-control {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
+    justify-content: center;
+    gap: 25px;
+    margin-bottom: 25px;
+    background: #fdf2e9;
+    padding: 10px;
+    border-radius: 15px;
 }
 
 .qty-control button {
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border: none;
-    border-radius: 10px;
-    background: #eee;
+    border-radius: 12px;
+    background: #25211e;
+    color: white;
     font-size: 20px;
     cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.qty-control button:active {
+    transform: scale(0.9);
 }
 
 #qty {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a0f08;
+    min-width: 30px;
+    text-align: center;
 }
 
 /* Catatan & Tombol */
 #catatan {
     width: 100%;
-    height: 80px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    margin-bottom: 20px;
+    height: 90px;
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    margin-bottom: 25px;
     resize: none;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#catatan:focus {
+    border-color: #e96711;
 }
 
 #btn-submit-order {
     width: 100%;
-    padding: 15px;
-    background-color: #27ae60;
+    padding: 18px;
+    background-color: #25211e; /* Hitam elegan */
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 15px;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: all 0.3s ease;
 }
 
 #btn-submit-order:hover {
-    background-color: #219150;
+    background-color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
