@@ -5,6 +5,16 @@ let currentProduct = null;
 let qty = 1;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // --- LOGIKA PROTEKSI SESI ---
+    // Jika tidak ada user yang login, tendang ke halaman login/index
+    const namaLogIn = localStorage.getItem('namaUser');
+    if (!namaLogIn) {
+        alert("Sesi berakhir, silakan login kembali.");
+        window.location.replace('index.html');
+        return;
+    }
+
+    // 1. Ambil ID dari URL
     const params = new URLSearchParams(window.location.search);
     const idProduk = params.get('id');
 
@@ -14,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // 2. Ambil data dari API
     try {
         const response = await fetch(APPS_SCRIPT_URL + '?action=getProducts');
         const result = await response.json();
@@ -23,10 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         // --- LOGIKA PENCARIAN YANG DIPERBAIKI ---
-        // Kita cari kunci yang mengandung kata 'produk' agar fleksibel (d_produk atau id_produk)
         currentProduct = result.data.find(item => {
             const keys = Object.keys(item);
-            // Mencari key yang mengandung kata 'produk'
             const idKey = keys.find(k => k.toLowerCase().includes('produk'));
             
             const idDariSheet = idKey ? String(item[idKey]).trim() : '';
@@ -49,7 +58,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderProduct(item) {
     const getVal = (key) => {
         const keys = Object.keys(item);
-        // Mencari kunci yang mendekati nama field (misal: 'nama', 'gambar', 'harga')
         const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
         return foundKey ? item[foundKey] : '';
     };
@@ -91,4 +99,13 @@ function submitOrder() {
 
     alert("Berhasil ditambahkan ke keranjang!");
     window.location.href = 'landing_page.html'; 
+}
+
+// --- FUNGSI LOGOUT ---
+// Anda bisa memanggil fungsi ini saat tombol logout diklik
+function logout() {
+    if (confirm('Apakah Anda yakin ingin keluar?')) {
+        localStorage.removeItem('namaUser');
+        window.location.replace('index.html');
+    }
 }
