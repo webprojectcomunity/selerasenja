@@ -5,7 +5,6 @@ let currentProduct = null;
 let qty = 1;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Ambil ID dari URL
     const params = new URLSearchParams(window.location.search);
     const idProduk = params.get('id');
 
@@ -15,32 +14,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 2. Ambil data menu untuk mencari detail produk berdasarkan ID
     try {
         const response = await fetch(APPS_SCRIPT_URL + '?action=getProducts');
         const result = await response.json();
         
-        // Cari produk yang sesuai dengan ID
-        currentProduct = result.data.find(item => 
-            (item.id_produk || item.id || '') === idProduk
-        );
+        if (!result.data || !Array.isArray(result.data)) {
+            throw new Error("Format data tidak valid");
+        }
+        
+        // --- LOGIKA PENCARIAN YANG DIPERBAIKI ---
+        // Kita cari kunci yang mengandung kata 'produk' agar fleksibel (d_produk atau id_produk)
+        currentProduct = result.data.find(item => {
+            const keys = Object.keys(item);
+            // Mencari key yang mengandung kata 'produk'
+            const idKey = keys.find(k => k.toLowerCase().includes('produk'));
+            
+            const idDariSheet = idKey ? String(item[idKey]).trim() : '';
+            return idDariSheet === idProduk.trim();
+        });
 
         if (currentProduct) {
             renderProduct(currentProduct);
         } else {
+            console.error("Gagal menemukan produk dengan ID:", idProduk);
             document.getElementById('nama-produk').innerText = "Produk tidak ditemukan";
         }
     } catch (error) {
-        console.error(error);
+        console.error("Error:", error);
         alert("Gagal memuat detail produk.");
     }
 });
 
 // --- FUNGSI TAMPILAN ---
 function renderProduct(item) {
-    document.getElementById('nama-produk').innerText = item.nama || item.Nama || 'Tanpa Nama';
-    document.getElementById('img-produk').src = item.gambar || item.Gambar || '';
-    document.getElementById('harga-produk').innerText = 'Harga: ' + (item.harga || item.Harga || '0');
+    const getVal = (key) => {
+        const keys = Object.keys(item);
+        // Mencari kunci yang mendekati nama field (misal: 'nama', 'gambar', 'harga')
+        const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
+        return foundKey ? item[foundKey] : '';
+    };
+
+    document.getElementById('nama-produk').innerText = getVal('nama') || 'Tanpa Nama';
+    document.getElementById('img-produk').src = getVal('gambar') || '';
+    document.getElementById('harga-produk').innerText = 'Harga: ' + (getVal('harga') || '0');
 }
 
 // --- LOGIKA KUANTITAS ---
@@ -54,20 +70,25 @@ function updateQty(change) {
 function submitOrder() {
     if (!currentProduct) return;
 
+    const getVal = (key) => {
+        const keys = Object.keys(currentProduct);
+        const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
+        return foundKey ? currentProduct[foundKey] : '';
+    };
+
     const catatan = document.getElementById('catatan').value;
     const orderData = {
-        id: currentProduct.id_produk || currentProduct.id,
-        nama: currentProduct.nama || currentProduct.Nama,
-        harga: currentProduct.harga || currentProduct.Harga,
+        id: getVal('d_produk') || getVal('id_produk'),
+        nama: getVal('nama'),
+        harga: getVal('harga'),
         jumlah: qty,
         catatan: catatan
     };
 
-    // Simpan ke localStorage agar bisa diakses di halaman Cart
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     cart.push(orderData);
     localStorage.setItem('cart', JSON.stringify(cart));
 
     alert("Berhasil ditambahkan ke keranjang!");
-    window.location.href = 'landing_page.html'; // Kembali ke menu
+    window.location.href = 'landing_page.html'; 
 }
