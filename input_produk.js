@@ -2,7 +2,7 @@
  * KONFIGURASI API
  ************************************************/
 // GANTI URL INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
-const API_URL = "ISI_DENGAN_URL_WEB_APP_ANDA_DISINI";
+const API_URL = "https://script.google.com/macros/s/AKfycbwSCT3UhUj2-6VcXeDbBYAQDD-CjUouquTMxDnvjj8Y-eGBvo_hSfXnk0E6xGWszeGwmg/exec";
 
 
 /************************************************
