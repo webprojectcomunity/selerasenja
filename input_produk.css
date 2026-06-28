@@ -1,4 +1,15 @@
+/* Proteksi tambahan untuk browser yang bandel */
+html {
+    background-color: #ffffff !important;
+    color-scheme: light only;
+    color: #000000 !important;
+}
 
+/* Mematikan fitur invert warna otomatis pada semua elemen */
+* {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: #e96711 #ffffff;
+}
 
         *{
             margin:0;
