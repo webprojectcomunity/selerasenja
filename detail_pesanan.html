@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail Pemesanan</title>
+    <link rel="stylesheet" href="css/landing_page.css">
+</head>
+<body>
+    <div class="app-container">
+        <h2 id="nama-produk">Memuat...</h2>
+        <img id="img-produk" style="width:100%; max-width:300px;">
+        <p id="harga-produk"></p>
+        
+        <div class="qty-control">
+            <button onclick="updateQty(-1)">-</button>
+            <span id="qty">1</span>
+            <button onclick="updateQty(1)">+</button>
+        </div>
+        
+        <textarea id="catatan" placeholder="Tambahkan catatan (misal: pedas)"></textarea>
+        
+        <button id="btn-submit-order" onclick="submitOrder()">Tambah ke Keranjang</button>
+    </div>
+    <script src="script_detail.js"></script>
+</body>
+</html>
