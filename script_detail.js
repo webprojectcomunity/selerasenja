@@ -75,9 +75,21 @@ function updateQty(change) {
 }
 
 // --- FUNGSI SUBMIT KE KERANJANG ---
-function submitOrder() {
-    if (!currentProduct) return;
+// --- FUNGSI SUBMIT KE KERANJANG SPREADSHEET ---
+async function submitOrder() {
+    if (!currentProduct) {
+        alert("Data produk belum termuat sempurna.");
+        return;
+    }
 
+    // Mengunci tombol agar user tidak melakukan double-click saat proses upload berjalan
+    const btnSubmit = document.getElementById('btn-submit-order');
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Menambahkan...";
+    }
+
+    // Helper untuk membaca nilai properti object secara case-insensitive
     const getVal = (key) => {
         const keys = Object.keys(currentProduct);
         const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
@@ -85,20 +97,51 @@ function submitOrder() {
     };
 
     const catatan = document.getElementById('catatan').value;
-    const orderData = {
-        id: getVal('d_produk') || getVal('id_produk'),
-        nama: getVal('nama'),
-        harga: getVal('harga'),
-        jumlah: qty,
-        catatan: catatan
+    const namaLogIn = localStorage.getItem('namaUser') || 'Guest';
+
+    // Susun objek data sesuai struktur penangkap di Apps Script
+    const payload = {
+        action: 'addToCart',
+        data: {
+            user: namaLogIn,
+            id_produk: getVal('id_produk') || getVal('id') || getVal('idproduk'),
+            nama_produk: getVal('nama') || getVal('nama_produk'),
+            harga: getVal('harga'),
+            jumlah: qty,
+            catatan: catatan
+        }
     };
 
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    cart.push(orderData);
-    localStorage.setItem('cart', JSON.stringify(cart));
+    try {
+        // Kirim data ke Google Apps Script menggunakan POST
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'text/plain' // text/plain menghindari preflight CORS issues di Apps Script
+            },
+            body: JSON.stringify(payload)
+        });
 
-    alert("Berhasil ditambahkan ke keranjang!");
-    window.location.href = 'landing_page.html'; 
+        const result = await response.json();
+
+        if (result.success) {
+            alert("Berhasil ditambahkan ke keranjang!");
+            window.location.href = 'landing_page.html'; 
+        } else {
+            throw new Error(result.message || "Terjadi kesalahan di sistem server.");
+        }
+
+    } catch (error) {
+        console.error("Error submit order:", error);
+        alert("Gagal menyimpan pesanan: " + error.message);
+    } finally {
+        // Kembalikan kondisi tombol jika proses selesai/gagal
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Tambah ke Keranjang";
+        }
+    }
 }
 
 // --- FUNGSI LOGOUT ---
