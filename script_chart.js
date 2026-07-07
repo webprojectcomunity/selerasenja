@@ -128,3 +128,8 @@ async function hapusItemKeranjang(idProduk, buttonElement) {
         buttonElement.innerText = "Hapus";
     }
 }
+
+// Fungsi untuk mengarahkan pengguna ke halaman keranjang belanja
+function bukaKeranjang() {
+    window.location.href = 'chart.html';
+}
