@@ -68,8 +68,8 @@ function renderProduct(item) {
     document.getElementById('nama-produk').innerText = getVal('nama') || 'Tanpa Nama';
     document.getElementById('img-produk').src = getVal('gambar') || '';
     
-    // MENAMPILKAN HARGA SATUAN DENGAN FORMAT RP DAN PECAHAN KOMA
-    document.getElementById('harga-produk').innerText = 'Harga: Rp ' + hargaSatuan.toLocaleString('id-ID') + ',00';
+    // MENGGUNAKAN TITIK UNTUK RIBUAN (Hasil: Rp 30.000)
+    document.getElementById('harga-produk').innerText = 'Harga: Rp ' + hargaSatuan.toLocaleString('id-ID');
     
     // Hitung total harga pertama kali saat data berhasil dimuat
     hitungDanTampilkanTotal();
@@ -91,8 +91,8 @@ function hitungDanTampilkanTotal() {
     
     const total = hargaSatuan * qty;
     
-    // MENAMPILKAN TOTAL HARGA DENGAN FORMAT RP DAN PECAHAN KOMA (,00)
-    document.getElementById('total-harga').innerText = 'Subtotal: Rp ' + total.toLocaleString('id-ID') + ',00';
+    // MENGGUNAKAN TITIK UNTUK RIBUAN (Hasil: Subtotal: Rp 30.000)
+    document.getElementById('total-harga').innerText = 'Subtotal: Rp ' + total.toLocaleString('id-ID');
 }
 // --- LOGIKA KUANTITAS ---
 function updateQty(change) {
