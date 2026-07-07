@@ -18,19 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- FUNGSI AMBIL DATA DARI SHEET 'chart' ---
 async function loadCartData() {
     const cartList = document.getElementById('cart-list');
+    const totalSection = document.getElementById('total-section');
+    
     try {
-        // Ambil semua data produk sekalian menyaring via parameter
-        const response = await fetch(APPS_SCRIPT_URL + '?action=getProducts');
-        const result = await response.json();
-
-        // Karena kita butuh data dari sheet 'chart', kita buat request khusus GET ke Apps Script
-        // Namun jika Apps Script Anda belum mendukung GET khusus chart, kita bisa tembak via query berikut:
-        const resChart = await fetch(APPS_SCRIPT_URL + '?action=getCart&user=' + encodeURIComponent(namaLogIn));
+        // PERBAIKAN: Langsung panggil action getCart, hapus fetch getProducts yang tidak digunakan
+        const resChart = await fetch(APPS_SCRIPT_URL + '?action=getCart&user=' + encodeURIComponent(namaLogIn.trim()));
         const chartResult = await resChart.json();
 
         if (!chartResult.success || !Array.isArray(chartResult.data)) {
             cartList.innerHTML = `<p style="text-align: center; color: #7f8c8d;">Keranjang masih kosong.</p>`;
-            document.getElementById('total-section').style.display = 'none';
+            if (totalSection) totalSection.style.display = 'none';
             return;
         }
 
@@ -38,7 +35,7 @@ async function loadCartData() {
 
         if (myCart.length === 0) {
             cartList.innerHTML = `<p style="text-align: center; color: #7f8c8d;">Keranjang Anda kosong.</p>`;
-            document.getElementById('total-section').style.display = 'none';
+            if (totalSection) totalSection.style.display = 'none';
             return;
         }
 
@@ -67,9 +64,14 @@ async function loadCartData() {
             cartList.appendChild(itemDiv);
         });
 
-        // Tampilkan grand total
-        document.getElementById('total-section').style.display = 'block';
-        document.getElementById('grand-total').innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+        // Tampilkan grand total jika elemennya tersedia
+        if (totalSection) {
+            totalSection.style.display = 'block';
+            const grandTotalElem = document.getElementById('grand-total');
+            if (grandTotalElem) {
+                grandTotalElem.innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+            }
+        }
 
     } catch (error) {
         console.error("Gagal memuat keranjang:", error);
@@ -107,7 +109,7 @@ async function hapusItemKeranjang(idProduk, buttonElement) {
             alert("Produk berhasil dihapus!");
             loadCartData(); // Reload kembali daftar keranjang terbaru
         } else {
-            throw new Error(result.message);
+            throw new Error(result.message || "Gagal menghapus item dari server.");
         }
     } catch (error) {
         console.error("Gagal menghapus item:", error);
