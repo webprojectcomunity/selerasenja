@@ -1,5 +1,5 @@
 // --- KONFIGURASI API ---
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMaKB9zAWbxHQnOwUJdhACpgaJyF38_hzN8UUhM0jUrvtyQThvBmYF05ZlqH8lbmd1/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBLIlk6lbANUmDwdUkMtldg0AB5aDD-9_7bAQJ6UAbcTHZeHwlnLluwyXIG2jWRxNX/exec';
 
 let currentProduct = null;
 let qty = 1;
