@@ -130,6 +130,21 @@ async function hapusItemKeranjang(idProduk, buttonElement) {
 }
 
 // Fungsi untuk mengarahkan pengguna ke halaman keranjang belanja
+// --- FUNGSI NAVIGASI LANDING PAGE ---
+
+/**
+ * Mengarahkan pengguna ke halaman keranjang belanja (chart.html)
+ */
 function bukaKeranjang() {
     window.location.href = 'chart.html';
+}
+
+/**
+ * Menangani fungsi logout pengguna
+ */
+function logout() {
+    if (confirm("Apakah Anda yakin ingin keluar?")) {
+        localStorage.removeItem('namaUser');
+        window.location.replace('index.html');
+    }
 }
