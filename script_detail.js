@@ -6,7 +6,6 @@ let qty = 1;
 
 document.addEventListener('DOMContentLoaded', async () => {
     // --- LOGIKA PROTEKSI SESI ---
-    // Jika tidak ada user yang login, tendang ke halaman login/index
     const namaLogIn = localStorage.getItem('namaUser');
     if (!namaLogIn) {
         alert("Sesi berakhir, silakan login kembali.");
@@ -62,9 +61,34 @@ function renderProduct(item) {
         return foundKey ? item[foundKey] : '';
     };
 
+    const hargaSatuan = getVal('harga') || '0';
+
     document.getElementById('nama-produk').innerText = getVal('nama') || 'Tanpa Nama';
     document.getElementById('img-produk').src = getVal('gambar') || '';
-    document.getElementById('harga-produk').innerText = 'Harga: ' + (getVal('harga') || '0');
+    document.getElementById('harga-produk').innerText = 'Harga: ' + hargaSatuan;
+    
+    // Hitung total harga pertama kali saat data berhasil dimuat
+    hitungDanTampilkanTotal();
+}
+
+// --- LOGIKA HITUNG TOTAL ---
+function hitungDanTampilkanTotal() {
+    if (!currentProduct) return;
+
+    const getVal = (key) => {
+        const keys = Object.keys(currentProduct);
+        const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
+        return foundKey ? currentProduct[foundKey] : '';
+    };
+
+    // Bersihkan karakter non-angka dari string harga sheet (misal Rp. 15.000 -> 15000)
+    const hargaRaw = getVal('harga').toString().replace(/[^0-9]/g, '');
+    const hargaSatuan = parseFloat(hargaRaw) || 0;
+    
+    const total = hargaSatuan * qty;
+    
+    // Tampilkan dengan format mata uang yang rapi
+    document.getElementById('total-harga').innerText = 'Subtotal: Rp ' + total.toLocaleString('id-ID');
 }
 
 // --- LOGIKA KUANTITAS ---
@@ -72,9 +96,11 @@ function updateQty(change) {
     qty += change;
     if (qty < 1) qty = 1;
     document.getElementById('qty').innerText = qty;
+    
+    // Perbarui teks total harga setiap kali kuantitas berubah
+    hitungDanTampilkanTotal();
 }
 
-// --- FUNGSI SUBMIT KE KERANJANG ---
 // --- FUNGSI SUBMIT KE KERANJANG SPREADSHEET ---
 async function submitOrder() {
     if (!currentProduct) {
@@ -82,14 +108,12 @@ async function submitOrder() {
         return;
     }
 
-    // Mengunci tombol agar user tidak melakukan double-click saat proses upload berjalan
     const btnSubmit = document.getElementById('btn-submit-order');
     if (btnSubmit) {
         btnSubmit.disabled = true;
         btnSubmit.innerText = "Menambahkan...";
     }
 
-    // Helper untuk membaca nilai properti object secara case-insensitive
     const getVal = (key) => {
         const keys = Object.keys(currentProduct);
         const foundKey = keys.find(k => k.trim().toLowerCase() === key.toLowerCase());
@@ -99,26 +123,29 @@ async function submitOrder() {
     const catatan = document.getElementById('catatan').value;
     const namaLogIn = localStorage.getItem('namaUser') || 'Guest';
 
-    // Susun objek data sesuai struktur penangkap di Apps Script
+    const hargaRaw = getVal('harga').toString().replace(/[^0-9]/g, '');
+    const hargaSatuan = parseFloat(hargaRaw) || 0;
+    const totalHarga = hargaSatuan * qty;
+
     const payload = {
         action: 'addToCart',
         data: {
             user: namaLogIn,
             id_produk: getVal('id_produk') || getVal('id') || getVal('idproduk'),
             nama_produk: getVal('nama') || getVal('nama_produk'),
-            harga: getVal('harga'),
+            harga: hargaSatuan,
             jumlah: qty,
+            total_harga: totalHarga, // TAMBAHAN: Mengirim total ke backend
             catatan: catatan
         }
     };
 
     try {
-        // Kirim data ke Google Apps Script menggunakan POST
         const response = await fetch(APPS_SCRIPT_URL, {
             method: 'POST',
             mode: 'cors',
             headers: {
-                'Content-Type': 'text/plain' // text/plain menghindari preflight CORS issues di Apps Script
+                'Content-Type': 'text/plain'
             },
             body: JSON.stringify(payload)
         });
@@ -136,7 +163,6 @@ async function submitOrder() {
         console.error("Error submit order:", error);
         alert("Gagal menyimpan pesanan: " + error.message);
     } finally {
-        // Kembalikan kondisi tombol jika proses selesai/gagal
         if (btnSubmit) {
             btnSubmit.disabled = false;
             btnSubmit.innerText = "Tambah ke Keranjang";
@@ -144,8 +170,6 @@ async function submitOrder() {
     }
 }
 
-// --- FUNGSI LOGOUT ---
-// Anda bisa memanggil fungsi ini saat tombol logout diklik
 function logout() {
     if (confirm('Apakah Anda yakin ingin keluar?')) {
         localStorage.removeItem('namaUser');
