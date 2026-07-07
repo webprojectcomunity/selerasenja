@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Keranjang Belanja</title>
+    <link rel="stylesheet" href="detail_pesanan.css"> <style>
+        /* Tambahan style khusus untuk halaman keranjang agar rapi */
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+        }
+        .cart-info {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .cart-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+        .cart-info p {
+            margin: 2px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .btn-hapus {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-hapus:disabled {
+            background-color: #bdc3c7;
+        }
+        .total-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #333;
+            text-align: right;
+        }
+        .btn-kembali {
+            background-color: #7f8c8d;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h2>Keranjang Belanja</h2>
+        <p id="user-display" style="font-size: 14px; color: #7f8c8d; margin-bottom: 20px;"></p>
+
+        <div id="cart-list">
+            <p style="text-align: center; color: #7f8c8d;">Memuat isi keranjang...</p>
+        </div>
+
+        <div class="total-section" id="total-section" style="display: none;">
+            <h3>Total Pembayaran: <span id="grand-total" style="color: #e74c3c;">Rp 0</span></h3>
+        </div>
+
+        <a href="landing_page.html" class="btn-kembali">← Kembali Belanja</a>
+    </div>
+
+    <script src="script_chart.js"></script>
+</body>
+</html>
