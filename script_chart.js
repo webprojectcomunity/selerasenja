@@ -11,7 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    document.getElementById('user-display').innerText = "Pengguna: " + namaLogIn;
+    const userDisplay = document.getElementById('user-display');
+    if (userDisplay) {
+        userDisplay.innerText = "Pengguna: " + namaLogIn;
+    }
     loadCartData();
 });
 
@@ -20,8 +23,10 @@ async function loadCartData() {
     const cartList = document.getElementById('cart-list');
     const totalSection = document.getElementById('total-section');
     
+    if (!cartList) return;
+
     try {
-        // PERBAIKAN: Langsung panggil action getCart, hapus fetch getProducts yang tidak digunakan
+        // Panggil data khusus milik user yang sedang aktif login
         const resChart = await fetch(APPS_SCRIPT_URL + '?action=getCart&user=' + encodeURIComponent(namaLogIn.trim()));
         const chartResult = await resChart.json();
 
@@ -39,14 +44,19 @@ async function loadCartData() {
             return;
         }
 
-        cartList.innerHTML = ''; // Kosongkan loading text
+        cartList.innerHTML = ''; // Bersihkan teks loading awal
         let grandTotal = 0;
 
-        // Render data pesanan dengan tombol hapus di kanan
+        // Render baris data dari spreadsheet ke elemen HTML
         myCart.forEach((item) => {
-            const harga = parseFloat(item.harga_satuan) || 0;
+            // Bersihkan sisa string/titik format ribuan sheet agar parsing angka tidak menjadi NaN
+            const hargaRaw = item.harga_satuan ? item.harga_satuan.toString().replace(/[^0-9.-]/g, '') : '0';
+            const totalRaw = item.total_harga ? item.total_harga.toString().replace(/[^0-9.-]/g, '') : '0';
+
+            const harga = parseFloat(hargaRaw) || 0;
             const jumlah = parseInt(item.jumlah) || 0;
-            const totalItem = parseFloat(item.total_harga) || (harga * jumlah);
+            const totalItem = parseFloat(totalRaw) || (harga * jumlah);
+            
             grandTotal += totalItem;
 
             const itemDiv = document.createElement('div');
@@ -64,7 +74,7 @@ async function loadCartData() {
             cartList.appendChild(itemDiv);
         });
 
-        // Tampilkan grand total jika elemennya tersedia
+        // Tampilkan kalkulasi total belanjaan di bagian bawah
         if (totalSection) {
             totalSection.style.display = 'block';
             const grandTotalElem = document.getElementById('grand-total');
@@ -83,7 +93,7 @@ async function loadCartData() {
 async function hapusItemKeranjang(idProduk, buttonElement) {
     if (!confirm("Apakah Anda yakin ingin menghapus produk ini dari keranjang?")) return;
 
-    // Mengunci tombol hapus saat loading proses
+    // Kunci tombol tindakan agar user tidak melakukan klik ganda (double-submit)
     buttonElement.disabled = true;
     buttonElement.innerText = "...";
 
@@ -107,7 +117,7 @@ async function hapusItemKeranjang(idProduk, buttonElement) {
 
         if (result.success) {
             alert("Produk berhasil dihapus!");
-            loadCartData(); // Reload kembali daftar keranjang terbaru
+            loadCartData(); // Memuat ulang daftar item terbaru langsung dari sheet
         } else {
             throw new Error(result.message || "Gagal menghapus item dari server.");
         }
