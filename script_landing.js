@@ -1,8 +1,6 @@
 // --- KONFIGURASI ---
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBLIlk6lbANUmDwdUkMtldg0AB5aDD-9_7bAQJ6UAbcTHZeHwlnLluwyXIG2jWRxNX/exec";
 let cachedData = []; // Untuk optimasi kecepatan
-const APPS_SCRIPT_URL = _0x4f1a.join('');
-let cachedData = []; // Untuk optimasi kecepatan
 
 function convertDriveUrl(url) {
     if (!url) return 'https://via.placeholder.com/300x200?text=No+Image';
