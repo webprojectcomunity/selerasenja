@@ -89,12 +89,13 @@ async function loadCartData() {
     }
 }
 
-// --- FUNGSI HAPUS DATA ITEM ---// --- FUNGSI HAPUS DATA ITEM (DIPERBARUI) ---
+// --- FUNGSI HAPUS DATA ITEM (BEBAS ERROR CORS) ---
 async function hapusItemKeranjang(event, idProduk, buttonElement) {
     if (event) event.preventDefault();
 
     if (!confirm("Apakah Anda yakin ingin menghapus produk ini dari keranjang?")) return;
 
+    // Kunci tombol tindakan agar tidak di-klik ganda
     buttonElement.disabled = true;
     buttonElement.innerText = "...";
 
@@ -107,7 +108,7 @@ async function hapusItemKeranjang(event, idProduk, buttonElement) {
     };
 
     try {
-        // Mode 'no-cors' mencegah browser memblokir request ke Google Script
+        // Gunakan mode 'no-cors' agar browser tidak mencegat redirect Google Apps Script
         await fetch(APPS_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
@@ -115,15 +116,15 @@ async function hapusItemKeranjang(event, idProduk, buttonElement) {
             body: JSON.stringify(payload)
         });
 
-        // Beri sedikit jeda 300ms agar Google Sheet selesai menghapus baris, 
-        // lalu muat ulang tampilan keranjang
+        // Beri jeda 300 milidetik agar Google Sheet selesai menghapus baris di server,
+        // kemudian panggil ulang data keranjang untuk memperbarui tampilan HTML
         setTimeout(() => {
             loadCartData();
         }, 300);
 
     } catch (error) {
         console.error("Gagal menghapus item:", error);
-        alert("Terjadi kesalahan jaringan.");
+        alert("Gagal terhubung ke jaringan.");
         buttonElement.disabled = false;
         buttonElement.innerText = "Hapus";
     }
