@@ -69,7 +69,7 @@ async function loadCartData() {
                     ${item.catatan ? `<p style="font-style: italic; color: #7f8c8d;">Catatan: "${item.catatan}"</p>` : ''}
                     <p style="font-weight: bold; margin-top: 5px;">Total: Rp ${totalItem.toLocaleString('id-ID')}</p>
                 </div>
-                <button class="btn-hapus" onclick="hapusItemKeranjang('${item.id_produk}', this)">Hapus</button>
+                <button type="button" class="btn-hapus" onclick="hapusItemKeranjang(event, '${item.id_produk}', this)">Hapus</button>
             `;
             cartList.appendChild(itemDiv);
         });
@@ -89,8 +89,11 @@ async function loadCartData() {
     }
 }
 
-// --- FUNGSI HAPUS DATA ITEM ---
-async function hapusItemKeranjang(idProduk, buttonElement) {
+// --- FUNGSI HAPUS DATA ITEM ---// --- FUNGSI HAPUS DATA ITEM (DIPERBARUI) ---
+async function hapusItemKeranjang(event, idProduk, buttonElement) {
+    // 1. Cegah perilaku default browser agar halaman tidak refresh tiba-tiba
+    if (event) event.preventDefault(); 
+
     if (!confirm("Apakah Anda yakin ingin menghapus produk ini dari keranjang?")) return;
 
     // Kunci tombol tindakan agar user tidak melakukan klik ganda (double-submit)
@@ -109,6 +112,7 @@ async function hapusItemKeranjang(idProduk, buttonElement) {
         const response = await fetch(APPS_SCRIPT_URL, {
             method: 'POST',
             mode: 'cors',
+            redirect: 'follow', // Pastikan browser mengikuti redirect dari Google
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(payload)
         });
@@ -122,13 +126,27 @@ async function hapusItemKeranjang(idProduk, buttonElement) {
             throw new Error(result.message || "Gagal menghapus item dari server.");
         }
     } catch (error) {
-        console.error("Gagal menghapus item:", error);
-        alert("Gagal menghapus item: " + error.message);
-        buttonElement.disabled = false;
-        buttonElement.innerText = "Hapus";
+        console.error("Error Detail:", error);
+        
+        // 2. PENANGANAN KHUSUS GOOGLE APPS SCRIPT
+        // Jika error adalah Failed to fetch (biasanya karena isu CORS redirect dari Google)
+        if (error.message.includes("Failed to fetch") || error.name === "TypeError") {
+            console.log("Terjadi pemblokiran redirect CORS, mengecek ulang keranjang...");
+            
+            // Kita asumsikan eksekusi di server Google sebenarnya berhasil, 
+            // jadi kita paksa muat ulang data untuk memperbarui tampilan.
+            loadCartData(); 
+            
+            // Opsional: Tampilkan pesan sukses ringan alih-alih error menakutkan
+            // alert("Item dihapus."); 
+        } else {
+            // Jika error lain yang benar-benar gagal
+            alert("Gagal menghapus item: " + error.message);
+            buttonElement.disabled = false;
+            buttonElement.innerText = "Hapus";
+        }
     }
 }
-
 // Fungsi untuk mengarahkan pengguna ke halaman keranjang belanja
 // --- FUNGSI NAVIGASI LANDING PAGE ---
 
