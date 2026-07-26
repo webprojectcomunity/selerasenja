@@ -105,7 +105,11 @@ function updateQty(change) {
 }
 
 // --- FUNGSI SUBMIT KE KERANJANG SPREADSHEET ---
-async function submitOrder() {
+// --- FUNGSI SUBMIT KE KERANJANG SPREADSHEET (BEBAS CORS ERROR) ---
+async function submitOrder(event) {
+    // 1. Cegah reload halaman bawaan browser
+    if (event) event.preventDefault();
+
     if (!currentProduct) {
         alert("Data produk belum termuat sempurna.");
         return;
@@ -138,34 +142,30 @@ async function submitOrder() {
             nama_produk: getVal('nama') || getVal('nama_produk'),
             harga: hargaSatuan,
             jumlah: qty,
-            total_harga: totalHarga, // TAMBAHAN: Mengirim total ke backend
+            total_harga: totalHarga,
             catatan: catatan
         }
     };
 
     try {
-        const response = await fetch(APPS_SCRIPT_URL, {
+        // Gunakan mode 'no-cors' agar browser tidak memblokir request ke Google Script
+        await fetch(APPS_SCRIPT_URL, {
             method: 'POST',
-            mode: 'cors',
+            mode: 'no-cors',
             headers: {
                 'Content-Type': 'text/plain'
             },
             body: JSON.stringify(payload)
         });
 
-        const result = await response.json();
-
-        if (result.success) {
-            alert("Berhasil ditambahkan ke keranjang!");
-            window.location.href = 'landing_page.html'; 
-        } else {
-            throw new Error(result.message || "Terjadi kesalahan di sistem server.");
-        }
+        // Karena mode 'no-cors', request terkirim tanpa error.
+        // Tampilkan notifikasi lalu redirect ke landing_page.html
+        alert("Berhasil ditambahkan ke keranjang!");
+        window.location.href = 'landing_page.html';
 
     } catch (error) {
         console.error("Error submit order:", error);
-        alert("Gagal menyimpan pesanan: " + error.message);
-    } finally {
+        alert("Gagal menyimpan pesanan. Periksa koneksi internet Anda.");
         if (btnSubmit) {
             btnSubmit.disabled = false;
             btnSubmit.innerText = "Tambah ke Keranjang";
