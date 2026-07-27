@@ -2,94 +2,103 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selesaikan Pesanan - Selera Senja</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Konfirmasi Transaksi</title>
+    <!-- Style Global dan Style Khusus Halaman Transaksi -->
+    <link rel="stylesheet" href="detail_pesanan.css">
     <link rel="stylesheet" href="transaksi.css">
 </head>
 <body>
 
-    <div class="transaksi-container">
-        <!-- Header Navigasi -->
-        <header class="header">
-            <button onclick="window.location.href='chart.html'" class="btn-back">← Kembali</button>
+    <div class="app-container">
+        <!-- Navigasi Atas -->
+        <div class="header">
+            <a href="chart.html" class="btn-kembali-header">← Keranjang</a>
             <h2>Konfirmasi Pembayaran</h2>
-        </header>
+        </div>
 
-        <!-- Informasi Pelanggan -->
-        <section class="section-card">
-            <h3>Detail Pelanggan</h3>
+        <!-- Card Informasi Pengguna -->
+        <div class="section-card">
+            <h3>Informasi Pemesan</h3>
             <div class="info-row">
-                <span>Nama Pemesan:</span>
-                <strong id="user-name">Memuat...</strong>
+                <span>Nama Pelanggan:</span>
+                <strong id="user-display" style="color: #2c3e50;">-</strong>
             </div>
-        </section>
+        </div>
 
-        <!-- Ringkasan Item Pesanan -->
-        <section class="section-card">
+        <!-- Card Daftar Makanan / Pesanan -->
+        <div class="section-card">
             <h3>Rincian Pesanan</h3>
             <div id="order-items-list" class="items-list">
-                <!-- Item keranjang akan di-render secara dinamis di sini -->
+                <p style="text-align: center; color: #7f8c8d; font-size: 13px;">Memuat rincian pesanan...</p>
             </div>
             
             <div class="divider"></div>
-            
-            <div class="summary-row">
-                <span>Subtotal:</span>
-                <span id="subtotal-price">Rp 0</span>
-            </div>
-            <div class="summary-row total-row">
-                <span>Total Bayar:</span>
-                <strong id="total-price">Rp 0</strong>
-            </div>
-        </section>
 
-        <!-- Pilihan Metode Pembayaran -->
-        <section class="section-card">
+            <div class="total-row">
+                <span>Total Pembayaran:</span>
+                <span id="grand-total">Rp 0</span>
+            </div>
+        </div>
+
+        <!-- Card Pilih Metode Pembayaran -->
+        <div class="section-card">
             <h3>Metode Pembayaran</h3>
             <div class="payment-options">
-                <label class="payment-card active" id="label-qris">
-                    <input type="radio" name="payment_method" value="QRIS" checked onchange="handlePaymentChange(this.value)">
+                <label class="payment-card active" id="label-tunai">
+                    <input type="radio" name="payment_method" value="Tunai" checked onclick="pilihPembayaran('Tunai')">
                     <div class="payment-info">
-                        <strong>QRIS</strong>
-                        <small>Scan via GoPay, OVO, ShopeePay, BCA, dll.</small>
+                        <span>Tunai / Cash</span>
+                        <small>Bayar langsung di kasir / tempat</small>
                     </div>
                 </label>
 
-                <label class="payment-card" id="label-tunai">
-                    <input type="radio" name="payment_method" value="Tunai" onchange="handlePaymentChange(this.value)">
+                <label class="payment-card" id="label-qris">
+                    <input type="radio" name="payment_method" value="QRIS" onclick="pilihPembayaran('QRIS')">
                     <div class="payment-info">
-                        <strong>Tunai (Cash)</strong>
-                        <small>Bayar langsung di kasir / meja</small>
+                        <span>QRIS / Non-Tunai</span>
+                        <small>Scan QR via GoPay, OVO, Dana, BNI, dll.</small>
                     </div>
                 </label>
             </div>
 
-            <!-- Tampilan Dinamis QRIS -->
-            <div id="qris-container" class="qris-box">
-                <p>Silakan scan kode QRIS berikut untuk melakukan pembayaran:</p>
-                <!-- Ganti URL gambar QRIS dengan link gambar QRIS asli toko Anda -->
-                <img src="https://via.placeholder.com/250x250?text=QRIS+Selera+Senja" alt="Kode QRIS Pembayaran" id="qris-image">
-                <small class="qris-note">*Pastikan nominal transfer sesuai dengan Total Bayar</small>
+            <!-- Detail QRIS -->
+            <div id="qris-box" class="qris-box" style="display: none;">
+                <p>Silakan scan kode QRIS di bawah ini:</p>
+                <img id="qris-image" src="qris_placeholder.png" alt="Kode QRIS Pembayaran">
+                <span class="qris-note">*Pastikan nominal transfer sesuai dengan total pembayaran.</span>
             </div>
+        </div>
 
-            <!-- Tampilan Dinamis Tunai -->
-            <div id="tunai-container" class="tunai-box" style="display: none;">
-                <p>Silakan tunjukkan bukti atau nomor pesanan Anda ke Kasir saat melakukan pembayaran secara tunai.</p>
-            </div>
-        </section>
-
-        <!-- Catatan Tambahan Pesanan -->
-        <section class="section-card">
+        <!-- Card Catatan Tambahan -->
+        <div class="section-card">
             <h3>Catatan Pesanan (Opsional)</h3>
-            <textarea id="order-notes" placeholder="Contoh: Tanpa sedotan, es sedikit, nomor meja 04..."></textarea>
-        </section>
+            <textarea id="catatan-transaksi" placeholder="Contoh: Tanpa sambal, bungkus terpisah, dll."></textarea>
+        </div>
 
-        <!-- Tombol Eksekusi -->
-        <button id="btn-submit-order" onclick="prosesEksekusiPesanan()" class="btn-checkout">
-            Konfirmasi & Proses Pesanan
-        </button>
+        <!-- Tombol Aksi Akhir -->
+        <button id="btn-proses-bayar" class="btn-checkout" onclick="prosesPembayaranAkhir()">Konfirmasi & Bayar Sekarang</button>
     </div>
 
+    <!-- Script Pemrosesan Transaksi -->
     <script src="script_transaksi.js"></script>
+
+    <script>
+        function pilihPembayaran(metode) {
+            const qrisBox = document.getElementById('qris-box');
+            const labelTunai = document.getElementById('label-tunai');
+            const labelQris = document.getElementById('label-qris');
+
+            if (metode === 'QRIS') {
+                qrisBox.style.display = 'block';
+                labelQris.classList.add('active');
+                labelTunai.classList.remove('active');
+            } else {
+                qrisBox.style.display = 'none';
+                labelTunai.classList.add('active');
+                labelQris.classList.remove('active');
+            }
+        }
+    </script>
 </body>
 </html>
