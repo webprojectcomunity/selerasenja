@@ -18,6 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (userDisplay) {
         userDisplay.innerText = "Pengguna: " + namaLogIn;
     }
+
+    // Pasang Event Listener langsung ke tombol Checkout (#btn-checkout)
+    const btnCheckout = document.getElementById('btn-checkout');
+    if (btnCheckout) {
+        btnCheckout.addEventListener('click', prosesSemuaTransaksi);
+    }
+
     loadCartData();
 });
 
@@ -118,8 +125,7 @@ async function hapusItemKeranjang(event, idProduk, buttonElement) {
             body: JSON.stringify(payload)
         });
 
-        // Beri jeda 300 milidetik agar Google Sheet selesai menghapus baris di server,
-        // kemudian panggil ulang data keranjang untuk memperbarui tampilan HTML
+        // Jeda 300ms agar Google Sheet selesai menghapus baris di server
         setTimeout(() => {
             loadCartData();
         }, 300);
@@ -147,20 +153,19 @@ function prosesSemuaTransaksi() {
 }
 
 // --- FUNGSI NAVIGASI LANDING PAGE ---
-
-/**
- * Mengarahkan pengguna ke halaman keranjang belanja (chart.html)
- */
 function bukaKeranjang() {
     window.location.href = 'chart.html';
 }
 
-/**
- * Menangani fungsi logout pengguna
- */
 function logout() {
     if (confirm("Apakah Anda yakin ingin keluar?")) {
         localStorage.removeItem('namaUser');
         window.location.replace('index.html');
     }
 }
+
+// --- EKSKUSI GLOBAL WINDOW (Mencegah ReferenceError pada onclick HTML) ---
+window.prosesSemuaTransaksi = prosesSemuaTransaksi;
+window.hapusItemKeranjang = hapusItemKeranjang;
+window.bukaKeranjang = bukaKeranjang;
+window.logout = logout;
