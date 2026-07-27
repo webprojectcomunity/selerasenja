@@ -11,6 +11,28 @@ function convertDriveUrl(url) {
 }
 
 /**
+ * FUNGSI BADGE: Memperbarui angka indikator pada ikon Cart dari localStorage
+ */
+function updateCartBadge() {
+    const badge = document.getElementById('cart-badge');
+    if (!badge) return;
+
+    // Ambil data keranjang (mendukung key 'cart' atau 'keranjang')
+    const rawCart = localStorage.getItem('cart') || localStorage.getItem('keranjang');
+    const cartData = JSON.parse(rawCart) || [];
+    
+    // Akumulasi total kuantitas
+    const totalItems = cartData.reduce((sum, item) => sum + Number(item.qty || item.jumlah || 1), 0);
+
+    if (totalItems > 0) {
+        badge.innerText = totalItems > 99 ? '99+' : totalItems;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+/**
  * FUNGSI UTAMA: Load Menu dengan Caching & Filtering
  */
 async function loadMenu(searchQuery = '') {
@@ -76,6 +98,9 @@ async function loadMenu(searchQuery = '') {
 
 // --- INISIALISASI & EVENT LISTENER (LOGIKAL GABUNGAN QR & MANUAL) ---
 document.addEventListener('DOMContentLoaded', async () => {
+    // 0. Update badge angka di Cart saat halaman pertama kali dibuka
+    updateCartBadge();
+
     const greetingElement = document.getElementById('user-greeting');
     
     // 1. CEK JALUR QR CODE TERLEBIH DAHULU
@@ -97,19 +122,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await response.json();
 
             if (data.success) {
-                // Simpan namaUser ke localStorage agar sesuai dengan standarisasi aplikasi Anda
                 localStorage.setItem('namaUser', data.user.nama);
-                localStorage.setItem('idUser', data.user.id_user); // Tambahan opsional untuk tracking transaksi
+                localStorage.setItem('idUser', data.user.id_user);
                 
                 if (greetingElement) greetingElement.innerText = `Hallo ${data.user.nama} !`;
                 
-                // Bersihkan parameter ?userId= di URL browser agar rapi
                 window.history.replaceState({}, document.title, window.location.pathname);
                 
-                // Muat menu makanan setelah berhasil login via QR
                 loadMenu();
                 initEventDelegation();
-                return; // Keluar dari fungsi agar tidak terlempar oleh validasi manual di bawah
+                return;
             } else {
                 alert("Gagal Login QR: " + data.message);
                 window.location.replace('index.html');
@@ -135,13 +157,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     initEventDelegation();
 });
 
-// Fungsi pemisah untuk menangani event click pada tombol item menu makanan (+)
+// Event Delegation untuk tombol tambah (+)
 function initEventDelegation() {
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('add-btn')) {
             const idProduk = e.target.getAttribute('data-id');
             if (idProduk) {
-                console.log("Navigasi ke:", idProduk); 
                 window.location.href = `detail_pesanan.html?id=${idProduk}`;
             } else {
                 alert("ID produk tidak ditemukan!");
