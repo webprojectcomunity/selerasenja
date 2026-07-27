@@ -1,0 +1,184 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1e1e24 0%, #0f0f12 100%);
+    color: #ffffff;
+    min-height: 100vh;
+    padding: 20px 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.transaksi-container {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-back {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    backdrop-filter: blur(5px);
+}
+
+/* Cards Glassmorphism */
+.section-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.section-card h3 {
+    font-size: 15px;
+    color: #ffb703;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+/* Items List */
+.items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 12px 0;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.total-row {
+    font-size: 16px;
+    color: #00f5d4;
+    margin-top: 8px;
+}
+
+/* Payment Options */
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.payment-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-card.active {
+    border-color: #00f5d4;
+    background: rgba(0, 245, 212, 0.08);
+}
+
+.payment-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.payment-info small {
+    color: #a0a0a0;
+    font-size: 11px;
+}
+
+/* Payment Detail Boxes */
+.qris-box, .tunai-box {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    text-align: center;
+    font-size: 13px;
+}
+
+#qris-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    margin: 12px 0;
+    border: 2px solid #fff;
+}
+
+.qris-note {
+    display: block;
+    color: #ffb703;
+    font-size: 11px;
+}
+
+textarea {
+    width: 100%;
+    height: 70px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    padding: 10px;
+    font-size: 13px;
+    resize: none;
+}
+
+/* Button Checkout */
+.btn-checkout {
+    background: linear-gradient(90deg, #ffb703 0%, #fb8500 100%);
+    border: none;
+    color: #000;
+    font-weight: bold;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(251, 133, 0, 0.3);
+    transition: transform 0.1s ease;
+}
+
+.btn-checkout:active {
+    transform: scale(0.98);
+}
