@@ -45,13 +45,17 @@
             <span>Home</span>
         </div>
         
-        <a href="chart.html" class="nav-item" style="text-decoration: none; color: inherit; cursor: pointer;">
-            <svg viewBox="0 0 24 24">
-                <rect x="6" y="7" width="12" height="12" rx="2"></rect>
-                <path d="M9 7V5a3 3 0 0 1 6 0v2"></path>
-            </svg>
-            <span>Cart</span>
-        </a>
+       <a href="chart.html" class="nav-item cart-nav-item" style="text-decoration: none; color: inherit; cursor: pointer; position: relative;">
+    <div class="cart-icon-wrapper" style="position: relative; display: inline-block;">
+        <svg viewBox="0 0 24 24">
+            <rect x="6" y="7" width="12" height="12" rx="2"></rect>
+            <path d="M9 7V5a3 3 0 0 1 6 0v2"></path>
+        </svg>
+        <!-- Badge Angka Jumlah Pesanan -->
+        <span id="cart-badge" class="cart-badge" style="display: none;">0</span>
+    </div>
+    <span>Cart</span>
+</a>
         
         <div class="nav-item">
             <svg viewBox="0 0 24 24">
