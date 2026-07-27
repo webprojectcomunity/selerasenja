@@ -3,6 +3,9 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBLIlk6lbANUmD
 
 const namaLogIn = localStorage.getItem('namaUser');
 
+// Variabel global untuk menampung data keranjang aktif
+let currentCartItems = [];
+
 document.addEventListener('DOMContentLoaded', () => {
     // Sesi Proteksi
     if (!namaLogIn) {
@@ -22,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadCartData() {
     const cartList = document.getElementById('cart-list');
     const totalSection = document.getElementById('total-section');
+    const btnCheckout = document.getElementById('btn-checkout');
     
     if (!cartList) return;
 
@@ -30,25 +34,22 @@ async function loadCartData() {
         const resChart = await fetch(APPS_SCRIPT_URL + '?action=getCart&user=' + encodeURIComponent(namaLogIn.trim()));
         const chartResult = await resChart.json();
 
-        if (!chartResult.success || !Array.isArray(chartResult.data)) {
-            cartList.innerHTML = `<p style="text-align: center; color: #7f8c8d;">Keranjang masih kosong.</p>`;
-            if (totalSection) totalSection.style.display = 'none';
-            return;
-        }
-
-        const myCart = chartResult.data;
-
-        if (myCart.length === 0) {
+        if (!chartResult.success || !Array.isArray(chartResult.data) || chartResult.data.length === 0) {
             cartList.innerHTML = `<p style="text-align: center; color: #7f8c8d;">Keranjang Anda kosong.</p>`;
+            currentCartItems = [];
             if (totalSection) totalSection.style.display = 'none';
+            if (btnCheckout) btnCheckout.disabled = true;
             return;
         }
+
+        currentCartItems = chartResult.data;
+        if (btnCheckout) btnCheckout.disabled = false;
 
         cartList.innerHTML = ''; // Bersihkan teks loading awal
         let grandTotal = 0;
 
         // Render baris data dari spreadsheet ke elemen HTML
-        myCart.forEach((item) => {
+        currentCartItems.forEach((item) => {
             // Bersihkan sisa string/titik format ribuan sheet agar parsing angka tidak menjadi NaN
             const hargaRaw = item.harga_satuan ? item.harga_satuan.toString().replace(/[^0-9.-]/g, '') : '0';
             const totalRaw = item.total_harga ? item.total_harga.toString().replace(/[^0-9.-]/g, '') : '0';
@@ -86,6 +87,7 @@ async function loadCartData() {
     } catch (error) {
         console.error("Gagal memuat keranjang:", error);
         cartList.innerHTML = `<p style="text-align: center; color: #e74c3c;">Gagal memuat data keranjang.</p>`;
+        if (btnCheckout) btnCheckout.disabled = true;
     }
 }
 
@@ -129,7 +131,21 @@ async function hapusItemKeranjang(event, idProduk, buttonElement) {
         buttonElement.innerText = "Hapus";
     }
 }
-// Fungsi untuk mengarahkan pengguna ke halaman keranjang belanja
+
+// --- FUNGSI MELANJUTKAN TRANSAKSI ---
+function prosesSemuaTransaksi() {
+    if (!currentCartItems || currentCartItems.length === 0) {
+        alert("Keranjang Anda kosong. Silakan pilih makanan terlebih dahulu.");
+        return;
+    }
+
+    // Simpan seluruh data keranjang ke localStorage untuk dibaca oleh transaksi.html
+    localStorage.setItem('checkout_items', JSON.stringify(currentCartItems));
+
+    // Arahkan ke halaman transaksi
+    window.location.href = 'transaksi.html';
+}
+
 // --- FUNGSI NAVIGASI LANDING PAGE ---
 
 /**
