@@ -16,30 +16,86 @@ function convertDriveUrl(url) {
 /**
  * FUNGSI BADGE: Memperbarui angka indikator pada ikon Cart dari localStorage
  */
+/**
+ * FUNGSI MEMPERBARUI TAMPILAN BADGE MERAH
+ */
 function updateCartBadge() {
-    const badge = document.getElementById('cart-badge');
-    if (!badge) return;
+  const badge = document.getElementById('cart-badge');
+  if (!badge) return;
 
-    // Tambahkan key penyimpanan Anda ke daftar pencarian (contoh: 'cartItems', 'pesanan', dll)
-    const rawCart = localStorage.getItem('cart') || 
-                    localStorage.getItem('keranjang') || 
-                    localStorage.getItem('cartItems') || 
-                    localStorage.getItem('pesanan');
-                    
-    const cartData = JSON.parse(rawCart) || [];
-    
-    // Akumulasi total kuantitas (memeriksa properti qty, jumlah, quantity, atau count)
-    const totalItems = Array.isArray(cartData) 
-        ? cartData.reduce((sum, item) => sum + Number(item.qty || item.jumlah || item.quantity || item.count || 1), 0)
-        : 0;
+  // Membaca data dari localStorage dengan toleransi berbagai nama key
+  const rawCart = localStorage.getItem('cart') || 
+                  localStorage.getItem('keranjang') || 
+                  localStorage.getItem('cartItems');
+                  
+  let cartData = [];
+  try {
+    cartData = rawCart ? JSON.parse(rawCart) : [];
+  } catch (e) {
+    cartData = [];
+  }
 
-    if (totalItems > 0) {
-        badge.innerText = totalItems > 99 ? '99+' : totalItems;
-        badge.style.display = 'flex'; // Menggunakan flex agar posisi angka presisi di tengah
-    } else {
-        badge.style.display = 'none';
-    }
+  // Hitung total item (memeriksa properti qty, jumlah, atau quantity)
+  const totalItems = Array.isArray(cartData) 
+    ? cartData.reduce((sum, item) => sum + Number(item.qty || item.jumlah || item.quantity || 1), 0)
+    : 0;
+
+  if (totalItems > 0) {
+    badge.innerText = totalItems > 99 ? '99+' : totalItems;
+    badge.style.display = 'flex'; // Menggunakan flex agar posisi angka tepat di tengah
+  } else {
+    badge.style.display = 'none';
+  }
 }
+
+/**
+ * FUNGSI SINKRONISASI KERANJANG DARI GOOGLE APPS SCRIPT
+ * Panggil fungsi ini saat halaman dimuat jika Anda menyimpan data di Spreadsheet
+ */
+async function syncCartFromDatabase(username) {
+  if (!username) {
+    updateCartBadge();
+    return;
+  }
+
+  const SCRIPT_URL = 'URL_WEB_APP_GOOGLE_SCRIPT_ANDA'; // Ganti dengan URL Web App Anda
+
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=getCart&user=${encodeURIComponent(username)}`);
+    const result = await response.json();
+
+    if (result.success && Array.isArray(result.data)) {
+      // Simpan hasil dari server ke localStorage
+      localStorage.setItem('cart', JSON.stringify(result.data));
+    }
+  } catch (error) {
+    console.error('Gagal mengambil data keranjang dari server:', error);
+  } finally {
+    // Perbarui indikator badge setelah proses fetch selesai
+    updateCartBadge();
+  }
+}
+
+// Event Listener saat halaman pertama kali dibuka
+document.addEventListener('DOMContentLoaded', () => {
+  // Ambil nama user aktif (sesuaikan key localStorage user Anda)
+  const activeUser = localStorage.getItem('currentUser') || localStorage.getItem('user_id') || 'guest';
+  
+  // Update badge lokal terlebih dahulu agar instan
+  updateCartBadge();
+
+  // Sinkronkan dengan Spreadsheet Google Apps Script
+  if (activeUser && activeUser !== 'guest') {
+    syncCartFromDatabase(activeUser);
+  }
+});
+
+// Listener untuk memantau perubahan keranjang dari tab/halaman lain secara real-time
+window.addEventListener('storage', (event) => {
+  if (['cart', 'keranjang', 'cartItems'].includes(event.key)) {
+    updateCartBadge();
+  }
+});
 
 /**
  * FUNGSI UTAMA: Load Menu dengan Caching & Filtering
