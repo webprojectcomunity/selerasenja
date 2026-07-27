@@ -13,20 +13,29 @@ function convertDriveUrl(url) {
 /**
  * FUNGSI BADGE: Memperbarui angka indikator pada ikon Cart dari localStorage
  */
+/**
+ * FUNGSI BADGE: Memperbarui angka indikator pada ikon Cart dari localStorage
+ */
 function updateCartBadge() {
     const badge = document.getElementById('cart-badge');
     if (!badge) return;
 
-    // Ambil data keranjang (mendukung key 'cart' atau 'keranjang')
-    const rawCart = localStorage.getItem('cart') || localStorage.getItem('keranjang');
+    // Tambahkan key penyimpanan Anda ke daftar pencarian (contoh: 'cartItems', 'pesanan', dll)
+    const rawCart = localStorage.getItem('cart') || 
+                    localStorage.getItem('keranjang') || 
+                    localStorage.getItem('cartItems') || 
+                    localStorage.getItem('pesanan');
+                    
     const cartData = JSON.parse(rawCart) || [];
     
-    // Akumulasi total kuantitas
-    const totalItems = cartData.reduce((sum, item) => sum + Number(item.qty || item.jumlah || 1), 0);
+    // Akumulasi total kuantitas (memeriksa properti qty, jumlah, quantity, atau count)
+    const totalItems = Array.isArray(cartData) 
+        ? cartData.reduce((sum, item) => sum + Number(item.qty || item.jumlah || item.quantity || item.count || 1), 0)
+        : 0;
 
     if (totalItems > 0) {
         badge.innerText = totalItems > 99 ? '99+' : totalItems;
-        badge.style.display = 'flex';
+        badge.style.display = 'flex'; // Menggunakan flex agar posisi angka presisi di tengah
     } else {
         badge.style.display = 'none';
     }
